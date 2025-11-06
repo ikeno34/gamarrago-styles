@@ -1,13 +1,22 @@
-import { useState } from "react";
-import { Search, Menu, User, MapPin, Filter, Star } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Search, MapPin, Filter, Star, User, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import StoreDetail from "@/components/StoreDetail";
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
-// Mock data for stores
+
+mapboxgl.accessToken = 'pk.eyJ1IjoiaWtlbm8xMjMiLCJhIjoiY21obGJ5ZmtrMHM4MzJxcHNjeTl6d3djYiJ9.UzZw8HbFmaGkwThT3suEcQ';
+
+
+const GAMARRA_CENTER = {
+  lat: -12.0573,
+  lng: -77.0133
+};
+
 const mockStores = [
   {
     id: 1,
@@ -17,6 +26,7 @@ const mockStores = [
     rating: 4.5,
     image: "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=400",
     distance: "150m",
+    coordinates: { lat: -12.0573, lng: -77.0133 }
   },
   {
     id: 2,
@@ -26,6 +36,7 @@ const mockStores = [
     rating: 4.8,
     image: "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=400",
     distance: "220m",
+    coordinates: { lat: -12.0580, lng: -77.0140 }
   },
   {
     id: 3,
@@ -35,6 +46,7 @@ const mockStores = [
     rating: 4.3,
     image: "https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?w=400",
     distance: "180m",
+    coordinates: { lat: -12.0565, lng: -77.0125 }
   },
   {
     id: 4,
@@ -44,20 +56,137 @@ const mockStores = [
     rating: 4.6,
     image: "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=400",
     distance: "340m",
+    coordinates: { lat: -12.0585, lng: -77.0120 }
   },
 ];
 
-const Map = () => {
-  const [selectedStore, setSelectedStore] = useState<typeof mockStores[0] | null>(null);
+const MapComponent = () => {
+  const mapContainer = useRef(null);
+  const map = useRef(null);
+  const [selectedStore, setSelectedStore] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const markersRef = useRef([]);
+
+  
+  useEffect(() => {
+    if (map.current) return; 
+    if (!mapContainer.current) return; 
+
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [GAMARRA_CENTER.lng, GAMARRA_CENTER.lat],
+        zoom: 16
+      });
+
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+      const geolocate = new mapboxgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true
+        },
+        trackUserLocation: true,
+        showUserHeading: true
+      });
+      map.current.addControl(geolocate, 'bottom-right');
+
+      map.current.on('load', () => {
+        mockStores.forEach(store => {
+          const el = document.createElement('div');
+          el.className = 'custom-marker';
+          el.innerHTML = `
+            <svg width="32" height="48" viewBox="0 0 32 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 0C10.477 0 6 4.477 6 10C6 17.5 16 30 16 30C16 30 26 17.5 26 10C26 4.477 21.523 0 16 0ZM16 14C13.7909 14 12 12.2091 12 10C12 7.79086 13.7909 6 16 6C18.2091 6 20 7.79086 20 10C20 12.2091 18.2091 14 16 14Z" fill="#9C27B0"/>
+            </svg>
+          `;
+          el.style.cursor = 'pointer';
+          el.style.width = '32px';
+          el.style.height = '48px';
+
+          const popup = new mapboxgl.Popup({ 
+            offset: 25,
+            closeButton: false
+          }).setHTML(`
+            <div style="padding: 12px; min-width: 180px;">
+              <h3 style="margin: 0 0 4px 0; font-weight: 600; font-size: 14px; color: #1a1a1a;">${store.name}</h3>
+              <p style="margin: 0 0 6px 0; color: #666; font-size: 12px;">${store.category}</p>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="color: #FFC107; font-size: 14px;">★</span>
+                <span style="font-size: 12px; font-weight: 600; color: #1a1a1a;">${store.rating}</span>
+                <span style="color: #999; font-size: 12px;">• ${store.distance}</span>
+              </div>
+            </div>
+          `);
+
+          // Crear y añadir marcador
+          const marker = new mapboxgl.Marker(el)
+            .setLngLat([store.coordinates.lng, store.coordinates.lat])
+            .setPopup(popup)
+            .addTo(map.current);
+
+          // Evento click en el marcador
+          el.addEventListener('click', () => {
+            setSelectedStore(store);
+          });
+
+          markersRef.current.push(marker);
+        });
+      });
+    } catch (error) {
+      console.error('Error al inicializar el mapa:', error);
+    }
+
+    // Cleanup
+    return () => {
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+    };
+  }, []);
+
+  // Función para centrar en la ubicación del usuario
+  const centerOnUser = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          if (map.current) {
+            map.current.flyTo({
+              center: [position.coords.longitude, position.coords.latitude],
+              zoom: 17,
+              duration: 2000
+            });
+          }
+        },
+        (error) => {
+          alert("No se pudo obtener tu ubicación. Activa el GPS en tu navegador.");
+        }
+      );
+    } else {
+      alert("Tu navegador no soporta geolocalización.");
+    }
+  };
+
+  const handleStoreClick = (store) => {
+    setSelectedStore(store);
+    // Centrar el mapa en la tienda seleccionada
+    if (map.current) {
+      map.current.flyTo({
+        center: [store.coordinates.lng, store.coordinates.lat],
+        zoom: 18,
+        duration: 1500
+      });
+    }
+  };
 
   return (
     <div className="h-screen w-full flex flex-col bg-background">
       {/* Header */}
       <header className="bg-card border-b shadow-sm px-4 py-3 flex items-center gap-4 z-10">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center">
-            <MapPin className="w-5 h-5 text-primary-foreground" />
+          <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+            <MapPin className="w-5 h-5 text-white" />
           </div>
           <span className="font-bold text-xl hidden sm:inline">Gamarra Go</span>
         </div>
@@ -106,31 +235,20 @@ const Map = () => {
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Map Area */}
-        <div className="flex-1 relative bg-muted">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center p-8 bg-card rounded-xl shadow-gamarra-lg max-w-md">
-              <MapPin className="w-16 h-16 text-primary mx-auto mb-4" />
-              <h2 className="text-2xl font-bold mb-2">Mapa Interactivo</h2>
-              <p className="text-muted-foreground mb-4">
-                Para ver el mapa completo con ubicaciones en tiempo real, necesitas configurar Mapbox.
-              </p>
-              <div className="bg-muted p-4 rounded-lg text-sm text-left space-y-2">
-                <p className="font-semibold">Pasos para activar el mapa:</p>
-                <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-                  <li>Crea una cuenta en <a href="https://mapbox.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">mapbox.com</a></li>
-                  <li>Obtén tu token público</li>
-                  <li>Configúralo en el proyecto</li>
-                </ol>
-              </div>
-            </div>
-          </div>
+        <div className="flex-1 relative">
+          <div 
+            ref={mapContainer} 
+            className="w-full h-full"
+          />
 
           {/* GPS Button */}
           <Button
-            className="absolute bottom-6 right-6 h-12 w-12 rounded-full shadow-gamarra-lg bg-gradient-primary hover:opacity-90"
+            onClick={centerOnUser}
+            className="absolute bottom-24 right-6 h-12 w-12 rounded-full shadow-lg bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 z-10"
             size="icon"
+            title="Mi ubicación"
           >
-            <MapPin className="h-5 w-5" />
+            <Navigation className="h-5 w-5 text-white" />
           </Button>
         </div>
 
@@ -146,7 +264,7 @@ const Map = () => {
             </div>
             
             <div className="flex gap-2 flex-wrap">
-              <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80">
+              <Badge className="cursor-pointer bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 border-0">
                 Ropa Mujer
               </Badge>
               <Badge variant="outline" className="cursor-pointer hover:bg-muted">
@@ -166,7 +284,7 @@ const Map = () => {
               <Card
                 key={store.id}
                 className="border-0 rounded-none cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => setSelectedStore(store)}
+                onClick={() => handleStoreClick(store)}
               >
                 <CardHeader className="p-4">
                   <div className="flex gap-3">
@@ -184,7 +302,7 @@ const Map = () => {
                       </CardDescription>
                       <div className="flex items-center gap-2 text-xs">
                         <div className="flex items-center gap-1">
-                          <Star className="h-3 w-3 fill-secondary text-secondary" />
+                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                           <span className="font-medium">{store.rating}</span>
                         </div>
                         <span className="text-muted-foreground">•</span>
@@ -201,13 +319,92 @@ const Map = () => {
 
       {/* Store Detail Modal */}
       {selectedStore && (
-        <StoreDetail
-          store={selectedStore}
-          onClose={() => setSelectedStore(null)}
-        />
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedStore(null)}>
+          <div className="bg-card rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="relative h-64">
+              <img
+                src={selectedStore.image}
+                alt={selectedStore.name}
+                className="w-full h-full object-cover rounded-t-xl"
+              />
+              <Button
+                variant="secondary"
+                size="icon"
+                className="absolute top-4 right-4 rounded-full"
+                onClick={() => setSelectedStore(null)}
+              >
+                ✕
+              </Button>
+            </div>
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h2 className="text-2xl font-bold mb-1">{selectedStore.name}</h2>
+                  <p className="text-muted-foreground">{selectedStore.category}</p>
+                </div>
+                <div className="flex items-center gap-1 bg-yellow-400/20 px-3 py-1 rounded-full">
+                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  <span className="font-semibold">{selectedStore.rating}</span>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex items-start gap-2">
+                  <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <div>
+                    <p className="font-medium">Dirección</p>
+                    <p className="text-sm text-muted-foreground">{selectedStore.address}</p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button 
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                    onClick={() => {
+                      window.open(`https://www.google.com/maps/dir/?api=1&destination=${selectedStore.coordinates.lat},${selectedStore.coordinates.lng}`, '_blank');
+                    }}
+                  >
+                    Cómo llegar
+                  </Button>
+                  <Button variant="outline" className="flex-1">
+                    Llamar
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
+
+      <style>{`
+        .mapboxgl-ctrl-bottom-right {
+          bottom: 80px !important;
+        }
+        
+        .custom-marker {
+          transition: transform 0.3s ease;
+        }
+        
+        .custom-marker:hover {
+          transform: translateY(-5px);
+        }
+        
+        .mapboxgl-popup-content {
+          padding: 0;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .mapboxgl-popup-close-button {
+          display: none;
+        }
+        
+        .mapboxgl-popup-tip {
+          border-top-color: white;
+        }
+      `}</style>
     </div>
   );
 };
 
-export default Map;
+export default MapComponent;
