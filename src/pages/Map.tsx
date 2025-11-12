@@ -1,13 +1,34 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, MapPin, Filter, Star, User, Navigation } from "lucide-react";
+import {
+  Search,
+  MapPin,
+  Filter,
+  Star,
+  User,
+  Navigation,
+  List, // 👈 Importado para el botón de la lista móvil
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
+// ... (Token y mockStores se mantienen igual)
 mapboxgl.accessToken =
   "pk.eyJ1IjoiaWtlbm8xMjMiLCJhIjoiY21obGJ5ZmtrMHM4MzJxcHNjeTl6d3djYiJ9.UzZw8HbFmaGkwThT3suEcQ";
 
@@ -19,13 +40,13 @@ const GAMARRA_CENTER = {
 const mockStores = [
   {
     id: 1,
-    name: "Moda Femenina Rosa",
+    name: "lady posh",
     category: "Ropa de Mujer",
-    address: "Galería El Dorado, Piso 2, Tienda 215",
+    address: "Av. Gamarra 939",
     rating: 4.5,
     image: "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=400",
     distance: "150m",
-    coordinates: { lat: -12.0573, lng: -77.0133 },
+    coordinates: { lat: -12.0675844, lng: -77.0129996 },
   },
   {
     id: 2,
@@ -39,25 +60,110 @@ const mockStores = [
   },
   {
     id: 3,
-    name: "Telas y Textiles",
+    name: "triforce",
     category: "Telas",
-    address: "Jr. Gamarra 845, Local 3",
+    address: "Jr. Agustín gamarra cuadra 9 galería centro 959 102 - A",
     rating: 4.3,
     image: "https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?w=400",
     distance: "180m",
-    coordinates: { lat: -12.0565, lng: -77.0125 },
+    coordinates: { lat: -12.0631599, lng: -77.0183524 },
   },
   {
     id: 4,
-    name: "Accesorios VIP",
+    name: " kawaiigrilsropa",
     category: "Accesorios",
-    address: "Galería Unicachi, Piso 3, Tienda 305",
+    address: "Girón Antonio bazo n777 tda 143",
     rating: 4.6,
     image: "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=400",
     distance: "340m",
-    coordinates: { lat: -12.0585, lng: -77.012 },
+    coordinates: { lat: -12.0665188, lng: -77.0169901 },
+  },
+  {
+    id: 5,
+    name: "rome",
+    category: "Todos los productos",
+    address: " Girón Agustín gamarra 820",
+    rating: 4.6,
+    image: "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=400",
+    distance: "340m",
+    coordinates: { lat: -12.0667467, lng: -77.0133707 },
   },
 ];
+
+// 🔹 COMPONENTE REUTILIZABLE PARA LA LISTA DE TIENDAS
+const StoreListContent = ({ stores, onStoreClick }) => {
+  // Aquí se podría añadir la lógica de filtrado por categorías
+  return (
+    <>
+      <div className="p-4 border-b">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold text-lg">Tiendas Cercanas</h3>
+          <Button variant="outline" size="sm">
+            <Filter className="h-4 w-4 mr-2" />
+            Filtros
+          </Button>
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          <Badge className="cursor-pointer bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 border-0">
+            Ropa Mujer
+          </Badge>
+          <Badge variant="outline" className="cursor-pointer hover:bg-muted">
+            Calzado
+          </Badge>
+          <Badge variant="outline" className="cursor-pointer hover:bg-muted">
+            Accesorios
+          </Badge>
+          <Badge variant="outline" className="cursor-pointer hover:bg-muted">
+            Telas
+          </Badge>
+        </div>
+      </div>
+
+      <div className="divide-y flex-1 overflow-y-auto">
+        {stores.length === 0 && (
+          <p className="p-4 text-center text-muted-foreground">
+            No se encontraron tiendas.
+          </p>
+        )}
+        {stores.map((store) => (
+          <Card
+            key={store.id}
+            className="border-0 rounded-none cursor-pointer hover:bg-muted/50 transition-colors"
+            onClick={() => onStoreClick(store)}
+          >
+            <CardHeader className="p-4">
+              <div className="flex gap-3">
+                <img
+                  src={store.image}
+                  alt={store.name}
+                  className="w-20 h-20 object-cover rounded-lg"
+                />
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-base mb-1 truncate">
+                    {store.name}
+                  </CardTitle>
+                  <CardDescription className="text-xs mb-2">
+                    {store.category}
+                  </CardDescription>
+                  <div className="flex items-center gap-2 text-xs">
+                    <div className="flex items-center gap-1">
+                      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                      <span className="font-medium">{store.rating}</span>
+                    </div>
+                    <span className="text-muted-foreground">•</span>
+                    <span className="text-muted-foreground">
+                      {store.distance}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+        ))}
+      </div>
+    </>
+  );
+};
 
 const MapComponent = () => {
   const mapContainer = useRef(null);
@@ -66,9 +172,10 @@ const MapComponent = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [userLocation, setUserLocation] = useState(null);
   const [hasRoute, setHasRoute] = useState(false);
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false); // 👈 Estado para el panel móvil
   const markersRef = useRef([]);
 
-  // Inicializar mapa
+  // ... (useEffect de inicialización del mapa se mantiene igual)
   useEffect(() => {
     if (map.current) return;
     if (!mapContainer.current) return;
@@ -148,7 +255,7 @@ const MapComponent = () => {
     };
   }, []);
 
-  // Función para centrar en la ubicación del usuario
+  // ... (Funciones centerOnUser, drawRoute, clearRoute se mantienen igual)
   const centerOnUser = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -168,7 +275,6 @@ const MapComponent = () => {
     }
   };
 
-  // Dibujar ruta usando Mapbox Directions API
   const drawRoute = async (destination) => {
     if (!userLocation || !map.current) {
       alert("Primero permite el acceso a tu ubicación.");
@@ -219,7 +325,6 @@ const MapComponent = () => {
     setHasRoute(true);
   };
 
-  // Eliminar ruta manualmente
   const clearRoute = () => {
     if (map.current && map.current.getSource("route")) {
       map.current.removeLayer("route");
@@ -228,6 +333,7 @@ const MapComponent = () => {
     }
   };
 
+  // 🔹 MANEJADOR DE CLIC MEJORADO
   const handleStoreClick = (store) => {
     setSelectedStore(store);
     if (map.current) {
@@ -237,11 +343,20 @@ const MapComponent = () => {
         duration: 1500,
       });
     }
+    setMobileSheetOpen(false); // 👈 Cierra el panel móvil al seleccionar
   };
+
+  // 🔹 LÓGICA DE FILTRADO PARA LA BÚSQUEDA
+  const filteredStores = mockStores.filter(
+    (store) =>
+      store.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      store.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      store.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="h-screen w-full flex flex-col bg-background">
-      {/* Header */}
+      {/* Header (sin cambios) */}
       <header className="bg-card border-b shadow-sm px-4 py-3 flex items-center gap-4 z-10">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
@@ -293,97 +408,67 @@ const MapComponent = () => {
 
       {/* Main */}
       <div className="flex-1 flex overflow-hidden">
+        {/* 🔹 Contenedor del Mapa */}
         <div className="flex-1 relative">
           <div ref={mapContainer} className="w-full h-full" />
 
-          {/* Botón GPS */}
+          {/* 🔹 Botones flotantes del Mapa (posición ajustada) */}
           <Button
             onClick={centerOnUser}
-            className="absolute bottom-24 right-6 h-12 w-12 rounded-full shadow-lg bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 z-10"
+            className="absolute bottom-28 md:bottom-24 right-6 h-12 w-12 rounded-full shadow-lg bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 z-10"
             size="icon"
             title="Mi ubicación"
           >
             <Navigation className="h-5 w-5 text-white" />
           </Button>
 
-          {/* 🔹 Botón Borrar Ruta */}
           {hasRoute && (
             <Button
               onClick={clearRoute}
-              className="absolute bottom-40 right-6 h-12 w-12 rounded-full shadow-lg bg-gradient-to-br from-gray-500 to-gray-700 hover:from-gray-600 hover:to-gray-800 z-10 text-white"
+              className="absolute bottom-44 md:bottom-40 right-6 h-12 w-12 rounded-full shadow-lg bg-gradient-to-br from-gray-500 to-gray-700 hover:from-gray-600 hover:to-gray-800 z-10 text-white"
               size="icon"
               title="Borrar ruta"
             >
               ✕
             </Button>
           )}
+
+          {/* 🔹 Botón y Panel para MÓVIL */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 md:hidden">
+            <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  size="lg"
+                  className="rounded-full shadow-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                >
+                  <List className="mr-2 h-5 w-5" />
+                  Ver Lista
+                </Button>
+              </SheetTrigger>
+              <SheetContent
+                side="bottom"
+                className="h-[70vh] flex flex-col p-0"
+              >
+                {/* El contenido se vuelve scrollable internamente */}
+                <StoreListContent
+                  stores={filteredStores}
+                  onStoreClick={handleStoreClick}
+                />
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
 
-        {/* Sidebar */}
-        <aside className="w-full md:w-96 bg-card border-l overflow-y-auto">
-          <div className="p-4 border-b">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-lg">Tiendas Cercanas</h3>
-              <Button variant="outline" size="sm">
-                <Filter className="h-4 w-4 mr-2" />
-                Filtros
-              </Button>
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              <Badge className="cursor-pointer bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 border-0">
-                Ropa Mujer
-              </Badge>
-              <Badge variant="outline" className="cursor-pointer hover:bg-muted">
-                Calzado
-              </Badge>
-              <Badge variant="outline" className="cursor-pointer hover:bg-muted">
-                Accesorios
-              </Badge>
-              <Badge variant="outline" className="cursor-pointer hover:bg-muted">
-                Telas
-              </Badge>
-            </div>
-          </div>
-
-          <div className="divide-y">
-            {mockStores.map((store) => (
-              <Card
-                key={store.id}
-                className="border-0 rounded-none cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => handleStoreClick(store)}
-              >
-                <CardHeader className="p-4">
-                  <div className="flex gap-3">
-                    <img
-                      src={store.image}
-                      alt={store.name}
-                      className="w-20 h-20 object-cover rounded-lg"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="text-base mb-1 truncate">
-                        {store.name}
-                      </CardTitle>
-                      <CardDescription className="text-xs mb-2">
-                        {store.category}
-                      </CardDescription>
-                      <div className="flex items-center gap-2 text-xs">
-                        <div className="flex items-center gap-1">
-                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                          <span className="font-medium">{store.rating}</span>
-                        </div>
-                        <span className="text-muted-foreground">•</span>
-                        <span className="text-muted-foreground">{store.distance}</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
+        {/* 🔹 Barra Lateral para ESCRITORIO */}
+        <aside className="w-96 bg-card border-l hidden md:flex md:flex-col">
+          <StoreListContent
+            stores={filteredStores}
+            onStoreClick={handleStoreClick}
+          />
         </aside>
       </div>
 
-      {/* Modal Detalle */}
+      {/* Modal Detalle (sin cambios) */}
       {selectedStore && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
@@ -438,7 +523,10 @@ const MapComponent = () => {
                 <div className="flex gap-2">
                   <Button
                     className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-                    onClick={() => drawRoute(selectedStore.coordinates)}
+                    onClick={() => {
+                      drawRoute(selectedStore.coordinates);
+                      setSelectedStore(null); // Cierra el modal al trazar ruta
+                    }}
                   >
                     Cómo llegar
                   </Button>
