@@ -8,7 +8,7 @@
       "color": ["Negro", "Blanco", "Gris"],
       "size": ["XS", "S", "M", "L", "XL"],
       "price": 24.50,
-      "image": "/public/polo_anime.jpg",
+      "image": "/polo_anime.jpg",
       "quantity": 150,
       "storeId": 4
     },
@@ -20,7 +20,7 @@
       "color": ["Rojo", "Negro"],
       "size": ["M", "L", "XL"],
       "price": 22.99,
-      "image": "/public/polo_addc.jpg",
+      "image": "/polo_addc.jpg",
       "quantity": 90,
       "storeId": 1
     },
@@ -32,7 +32,7 @@
       "color": ["Negro", "Blanco"],
       "size": ["38", "39", "40", "41", "42", "43"],
       "price": 79.90,
-      "image": "/public/zapatillas_street.jpg",
+      "image": "/zapatillas_street.jpg",
       "quantity": 65,
       "storeId": 5
     },
@@ -44,7 +44,7 @@
       "color": ["Azul", "Rojo", "Verde"],
       "size": ["36", "37", "38", "39", "40"],
       "price": 15.00,
-      "image": "/public/sandalias_a_rayas.jpg",
+      "image": "/sandalias_a_rayas.jpg",
       "quantity": 120,
       "storeId": 1
     },
@@ -56,7 +56,7 @@
       "color": ["Azul Oscuro", "Negro"],
       "size": ["28", "30", "32", "34", "36"],
       "price": 49.95,
-      "image": "/public/jeans_slims.jpg",
+      "image": "/jeans_slims.jpg",
       "quantity": 80,
       "storeId": 2
     },
@@ -68,7 +68,7 @@
       "color": ["Gris", "Negro"],
       "size": ["S", "M", "L", "XL"],
       "price": 29.99,
-      "image": "/public/short_deportivo.jpg",
+      "image": "/short_deportivo.jpg",
       "quantity": 110,
       "storeId": 5
     },
@@ -80,7 +80,7 @@
       "color": ["Negro", "Azul", "Gris"],
       "size": ["S", "M", "L", "XL", "XXL"],
       "price": 89.90,
-      "image": "/public/casaca_windbreaker.jpg",
+      "image": "/casaca_windbreaker.jpg",
       "quantity": 70,
       "storeId": 2
     },
@@ -92,7 +92,7 @@
       "color": ["Negro", "Rojo"],
       "size": ["Única"],
       "price": 19.50,
-      "image": "/public/gorra_urban.jpg",
+      "image": "/gorra_urban.jpg",
       "quantity": 140,
       "storeId": 4
     },
@@ -104,7 +104,7 @@
       "color": ["Blanco", "Beige", "Negro"],
       "size": ["S", "M", "L", "XL"],
       "price": 27.90,
-      "image": "/public/polo_oversize.jpg",
+      "image": "/polo_oversize.jpg",
       "quantity": 95,
       "storeId": 3
     },
@@ -116,7 +116,7 @@
       "color": ["Verde Oliva", "Negro"],
       "size": ["25L"],
       "price": 59.99,
-      "image": "/public/mochila_viaje.jpg",
+      "image": "/mochila_viaje.jpg",
       "quantity": 60,
       "storeId": 4
     },
@@ -128,7 +128,7 @@
       "color": ["Blanco", "Azul", "Coral"],
       "size": ["37", "38", "39", "40", "41", "42", "43"],
       "price": 99.90,
-      "image": "/public/zapatillas_airflow.jpg",
+      "image": "/zapatillas_airflow.jpg",
       "quantity": 85,
       "storeId": 5
     },
@@ -140,7 +140,7 @@
       "color": ["Gris", "Negro", "Beige"],
       "size": ["S", "M", "L", "XL"],
       "price": 34.99,
-      "image": "/public/panatalon_jogger.jpg",
+      "image": "/panatalon_jogger.jpg",
       "quantity": 130,
       "storeId": 3
     },
@@ -152,7 +152,7 @@
       "color": ["Morado", "Negro"],
       "size": ["S", "M", "L"],
       "price": 26.50,
-      "image": "/public/olo.jpg",
+      "image": "/olo.jpg",
       "quantity": 75,
       "storeId": 2
     },
@@ -164,7 +164,7 @@
       "color": ["Crema", "Negro", "Gris","Celeste"],
       "size": ["M", "L", "XL"],
       "price": 64.90,
-      "image": "/public/sudadera_cloud.jpg",
+      "image": "/sudadera_cloud.jpg",
       "quantity": 55,
       "storeId": 3
     },
@@ -176,7 +176,7 @@
       "color": ["Negro", "Marrón"],
       "size": ["Única"],
       "price": 29.00,
-      "image": "/public/lentes_sol.jpg",
+      "image": "/lentes_sol.jpg",
       "quantity": 150,
       "storeId": 4
     },
@@ -188,7 +188,7 @@
       "color": ["Negro", "Beige"],
       "size": ["Única"],
       "price": 45.00,
-      "image": "/public/cartera_eco.jpg",
+      "image": "/cartera_eco.jpg",
       "quantity": 40,
       "storeId": 1
     },
@@ -200,7 +200,7 @@
       "color": ["Azul", "Negro"],
       "size": ["37", "38", "39", "40", "41", "42"],
       "price": 18.50,
-      "image": "/public/sandalias_negra.jpg",
+      "image": "/sandalias_negra.jpg",
       "quantity": 200,
       "storeId": 5
     },
@@ -212,7 +212,7 @@
       "color": ["Blanco", "Gris"],
       "size": ["S", "M", "L"],
       "price": 54.90,
-      "image": "/public/chompa_nordic.jpg",
+      "image": "/chompa_nordic.jpg",
       "quantity": 65,
       "storeId": 1
     },
@@ -224,7 +224,7 @@
       "color": ["Negro", "Verde"],
       "size": ["S", "M", "L", "XL"],
       "price": 23.90,
-      "image": "/public/polo_gamer.jpg",
+      "image": "/polo_gamer.jpg",
       "quantity": 140,
       "storeId": 4
     },
@@ -236,7 +236,7 @@
       "color": ["Negro"],
       "size": ["15L"],
       "price": 72.00,
-      "image": "/public/maletin_office.jpg",
+      "image": "/maletin_office.jpg",
       "quantity": 50,
       "storeId": 2
     },
@@ -248,7 +248,7 @@
       "color": ["Crema", "Azul"],
       "size": ["38", "39", "40", "41", "42", "43"],
       "price": 89.50,
-      "image": "/public/zapatillas_retrorunner.jpg",
+      "image": "/zapatillas_retrorunner.jpg",
       "quantity": 100,
       "storeId": 3
     }
