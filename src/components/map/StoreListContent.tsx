@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
 
 export const StoreListContent = ({ stores, onStoreClick }) => {
-  // Aquí se podría añadir la lógica de filtrado por categorías
   return (
     <>
       <div className="p-4 border-b">
@@ -32,7 +31,7 @@ export const StoreListContent = ({ stores, onStoreClick }) => {
             Telas
           </Badge>
           <Button asChild>
-          <Link to="poges/Products">Ir a mi página</Link>
+          <Link to="/products">Ir a mi página</Link>
         </Button>
         </div>
       </div>

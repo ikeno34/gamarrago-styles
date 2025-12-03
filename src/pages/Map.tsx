@@ -21,11 +21,11 @@ import {
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { mockStores } from "@/components/map/mocks";
-import { Link } from "react-router-dom";
+// 1. IMPORTAR useLocation
+import { Link, useLocation } from "react-router-dom"; 
 import { StoreListContent } from "@/components/map/StoreListContent";
 import Header from "@/components/utils/Header";
 
-// ... (Token y mockStores se mantienen igual)
 mapboxgl.accessToken =
   "pk.eyJ1IjoiaWtlbm8xMjMiLCJhIjoiY21obGJ5ZmtrMHM4MzJxcHNjeTl6d3djYiJ9.UzZw8HbFmaGkwThT3suEcQ";
 
@@ -34,7 +34,6 @@ const GAMARRA_CENTER = {
   lng: -77.0133,
 };
 
-
 const MapComponent = () => {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -42,10 +41,12 @@ const MapComponent = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [userLocation, setUserLocation] = useState(null);
   const [hasRoute, setHasRoute] = useState(false);
-  const [mobileSheetOpen, setMobileSheetOpen] = useState(false); // 👈 Estado para el panel móvil
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
   const markersRef = useRef([]);
 
-  // ... (useEffect de inicialización del mapa se mantiene igual)
+  // 2. OBTENER EL ESTADO DE LA NAVEGACIÓN
+  const location = useLocation(); 
+
   useEffect(() => {
     if (map.current) return;
     if (!mapContainer.current) return;
@@ -76,7 +77,7 @@ const MapComponent = () => {
         });
       });
 
-      // Crear marcadores de tiendas (estáticos)
+      // Crear marcadores de tiendas
       mockStores.forEach((store) => {
         const el = document.createElement("div");
         el.className = "custom-marker";
@@ -111,10 +112,32 @@ const MapComponent = () => {
 
         el.addEventListener("click", () => {
           setSelectedStore(store);
+          map.current.flyTo({
+             center: [store.coordinates.lng, store.coordinates.lat],
+             zoom: 18,
+             duration: 1500,
+           });
         });
 
         markersRef.current.push(marker);
       });
+
+      // 3. LÓGICA DE REDIRECCIÓN DESDE PRODUCTO
+      // Si venimos de ProductDetail, location.state tendrá la tienda objetivo
+      if (location.state && location.state.targetStore) {
+        const { targetStore } = location.state;
+        
+        // Enfocar el mapa en la tienda
+        map.current.flyTo({
+          center: [targetStore.coordinates.lng, targetStore.coordinates.lat],
+          zoom: 18,
+          duration: 2000, // Un poco más lento para que se note el movimiento
+        });
+
+        // Abrir automáticamente el modal de la tienda
+        setSelectedStore(targetStore);
+      }
+
     });
 
     return () => {
@@ -123,9 +146,9 @@ const MapComponent = () => {
         map.current = null;
       }
     };
-  }, []);
+  // Agregamos location a las dependencias, aunque el mapa solo se inicializa una vez
+  }, [location]); 
 
-  // ... (Funciones centerOnUser, drawRoute, clearRoute se mantienen igual)
   const centerOnUser = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -203,7 +226,6 @@ const MapComponent = () => {
     }
   };
 
-  // 🔹 MANEJADOR DE CLIC MEJORADO
   const handleStoreClick = (store) => {
     setSelectedStore(store);
     if (map.current) {
@@ -213,10 +235,9 @@ const MapComponent = () => {
         duration: 1500,
       });
     }
-    setMobileSheetOpen(false); // 👈 Cierra el panel móvil al seleccionar
+    setMobileSheetOpen(false); 
   };
 
-  // 🔹 LÓGICA DE FILTRADO PARA LA BÚSQUEDA
   const filteredStores = mockStores.filter(
     (store) =>
       store.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -226,15 +247,11 @@ const MapComponent = () => {
 
   return (
     <div className="h-screen w-full flex flex-col bg-background">
-      {/* Header (sin cambios) */}
       <Header />
-      {/* Main */}
       <div className="flex-1 flex overflow-hidden">
-        {/* 🔹 Contenedor del Mapa */}
         <div className="flex-1 relative">
           <div ref={mapContainer} className="w-full h-full" />
 
-          {/* 🔹 Botones flotantes del Mapa (posición ajustada) */}
           <Button
             onClick={centerOnUser}
             className="absolute bottom-28 md:bottom-24 right-6 h-12 w-12 rounded-full shadow-lg bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 z-10"
@@ -255,7 +272,6 @@ const MapComponent = () => {
             </Button>
           )}
 
-          {/* 🔹 Botón y Panel para MÓVIL */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 md:hidden">
             <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
               <SheetTrigger asChild>
@@ -271,7 +287,6 @@ const MapComponent = () => {
                 side="bottom"
                 className="h-[70vh] flex flex-col p-0"
               >
-                {/* El contenido se vuelve scrollable internamente */}
                 <StoreListContent
                   stores={filteredStores}
                   onStoreClick={handleStoreClick}
@@ -281,7 +296,6 @@ const MapComponent = () => {
           </div>
         </div>
 
-        {/* 🔹 Barra Lateral para ESCRITORIO */}
         <aside className="w-96 bg-card border-l hidden md:flex md:flex-col">
           <StoreListContent
             stores={filteredStores}
@@ -290,7 +304,6 @@ const MapComponent = () => {
         </aside>
       </div>
 
-      {/* Modal Detalle (sin cambios) */}
       {selectedStore && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
@@ -347,7 +360,7 @@ const MapComponent = () => {
                     className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                     onClick={() => {
                       drawRoute(selectedStore.coordinates);
-                      setSelectedStore(null); // Cierra el modal al trazar ruta
+                      setSelectedStore(null);
                     }}
                   >
                     Cómo llegar
